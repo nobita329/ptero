@@ -119,7 +119,7 @@ panel_menu() {
                 ;;
             2) 
                 echo -e "${B}➜ Installing CasaOS...${N}"
-                bash <(curl -s 
+                bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/panel/casaos.sh)
                 pause 
                 ;;
             3) 
