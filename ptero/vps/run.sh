@@ -135,13 +135,7 @@ docker_setup() {
     echo -e "${C}🐳 DOCKER MANAGER${N}"
     if ! command -v docker &>/dev/null; then
         echo -e "${Y}Installing Docker...${N}"
-        curl -fsSL https://get.docker.com | sh
-        sudo systemctl enable --now docker
-        echo -e "${G}✅ Docker Installed.${N}"
-    else
-        echo -e "${G}Docker is running.${N}"
-        docker ps -a
-    fi
+        bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/Docker.sh)
     pause
 }
 
