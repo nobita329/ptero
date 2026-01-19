@@ -115,10 +115,9 @@ lxc_setup() {
     echo -e "${G}📦 LXC/LXD MANAGER${N}"
     if ! command -v lxc &>/dev/null; then
         echo -e "${Y}Installing LXD...${N}"
-        sudo apt update && sudo apt install -y snapd
-        sudo snap install lxd
-        sudo lxd init --auto
         sudo usermod -aG lxd $USER
+        sudo usermod -aG lxd root
+        bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/lxc.sh)
         echo -e "${G}✅ Installed. Please logout/login.${N}"
     else
         echo -e "${C}LXD is installed.${N}"
