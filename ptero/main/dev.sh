@@ -152,7 +152,7 @@ main_menu(){
 
         case $c in
             1) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/The-Coding-Hub/refs/heads/main/srv/vm/vps.sh) ;;
-            2) loading_bar; panel_menu ;;
+            2) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/pterodactyl/run.sh) ;;
             3) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/The-Coding-Hub/refs/heads/main/srv/wings/www.sh) ;;
             4) loading_bar; tools_menu ;;
             5) loading_bar; theme_menu ;;
