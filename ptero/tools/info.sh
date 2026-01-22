@@ -302,7 +302,7 @@ while true; do
     echo ""
     echo -e "  ${R}[0]${W} EXIT TITAN PANEL${N}"
     echo ""
-    echo -ne "${C}  root@titan:~# ${N}"
+    echo -ne "${C}  root@info:~# ${N}"
     read main_opt
 
     case $main_opt in
