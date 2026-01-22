@@ -1,10 +1,10 @@
 #!/bin/bash
 # ===========================================================
-# CODING HUB Terminal Control Panel (v2.1 - New Banner)
-# Mode By - Nobita
+# CODING HUB Terminal Control Panel (v3.5 - Stable Fix)
+# UI Layout: Fixed Left | Colors: Old (Standard)
 # ===========================================================
 
-# --- COLORS & STYLES ---
+# --- 1. COLORS ---
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
@@ -12,81 +12,141 @@ BLUE='\033[1;34m'
 PURPLE='\033[1;35m'
 CYAN='\033[1;36m'
 WHITE='\033[1;37m'
+GRAY='\033[1;30m'
+NC='\033[0m'
 BOLD='\033[1m'
-NC='\033[0m' # No Color
-GRAY='\033[38;5;240m'
-ORANGE='\033[38;5;208m'
 
-# --- UI ELEMENTS (Adjusted Width for New Banner) ---
-# Width set to match the large banner (approx 98 chars)
-T_LINE="${GRAY}──────────────────────────────────────────────────────────────────────────────────────────────────${NC}"
-T_TOP="${GRAY}┌──────────────────────────────────────────────────────────────────────────────────────────────────┐${NC}"
-T_BOT="${GRAY}└──────────────────────────────────────────────────────────────────────────────────────────────────┘${NC}"
-T_SIDE="${GRAY}│${NC}"
+# --- 2. UI CONFIGURATION ---
+BORDER_COLOR=$GRAY
+LOGO_COLOR=$CYAN
+ACCENT_COLOR=$BLUE
+TEXT_COLOR=$WHITE
+
+# Box Drawing Characters
+CORNER_TL="┌"
+CORNER_TR="┐"
+CORNER_BL="└"
+CORNER_BR="┘"
+LINE_H="─"
+LINE_V="│"
+
+# FIXED WIDTH (Matches the large banner size)
+UI_WIDTH=98
 
 # ===================== HELPER FUNCTIONS =====================
 
-pause(){ 
-    echo -e "\n${GRAY}  Press [ENTER] to continue...${NC}"
-    read -r
+center_text_inner() {
+    local text="$1"
+    # Remove color codes to measure length
+    local clean_text=$(echo -e "$text" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g")
+    local text_len=${#clean_text}
+    
+    # Calculate padding to center text INSIDE the box
+    local padding=$(( (UI_WIDTH - text_len) / 2 ))
+    
+    printf "%${padding}s" ""
+    echo -ne "$text"
+    
+    local remaining=$(( UI_WIDTH - padding - text_len ))
+    printf "%${remaining}s" ""
 }
 
 loading_bar() {
-    echo -ne "${CYAN}  Loading: ${NC}[ "
-    for i in {1..20}; do
+    echo -ne "\n${CYAN}  Loading: ${NC}[ "
+    for i in {1..40}; do
         echo -ne "${GREEN}▓${NC}"
-        sleep 0.02
+        sleep 0.01
     done
-    echo -e " ] ${GREEN}Done!${NC}"
+    echo -e " ] ${GREEN}Done!${NC}\n"
     sleep 0.3
 }
 
-# ===================== HEADER & BANNER =====================
+# ===================== HEADER & DASHBOARD =====================
 header(){
     clear
-    # Dynamic Random Color for Logo
-    COLORS=($RED $GREEN $YELLOW $BLUE $PURPLE $CYAN)
-    RC=${COLORS[$RANDOM % ${#COLORS[@]}]}
+    # Top Border
+    echo -e "${BORDER_COLOR}${CORNER_TL}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${CORNER_TR}${NC}"
     
-    echo -e "${RC}"
-    echo " ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗     ██╗  ██╗██╗   ██╗██████╗ "
-    echo "██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝     ██║  ██║██║   ██║██╔══██╗"
-    echo "██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗    ███████║██║   ██║██████╔╝"
-    echo "██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║    ██╔══██║██║   ██║██╔══██╗"
-    echo "╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝    ██║  ██║╚██████╔╝██████╔╝"
-    echo " ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ "
-    echo -e "${NC}"
+    # --- LOGO AREA ---
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR} ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗     ██╗  ██╗██╗   ██╗██████╗ ${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR}██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝     ██║  ██║██║   ██║██╔══██╗${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${ACCENT_COLOR}██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗    ███████║██║   ██║██████╔╝${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${ACCENT_COLOR}██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║    ██╔══██║██║   ██║██╔══██╗${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR}╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝    ██║  ██║╚██████╔╝██████╔╝${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
     
-    echo -e "                               ${BOLD}>> DEVELOPED BY NOBITA (2026) <<${NC}"
-    echo -e ""
-    # System Status Bar
-    USER_INFO=$(whoami)
-    HOST_INFO=$(hostname)
-    DATE_INFO=$(date +'%H:%M')
-    echo -e "  ${GRAY}User:${NC} $USER_INFO ${GRAY}|${NC} ${GRAY}Host:${NC} $HOST_INFO ${GRAY}|${NC} ${GRAY}Time:${NC} $DATE_INFO"
-    echo -e "${T_LINE}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${WHITE}CODING HUB CONTROL PANEL v3.5${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${BOLD}>> DEVELOPED BY NOBITA (2026) <<${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    
+    # Separator
+    echo -e "${BORDER_COLOR}${LINE_V}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${LINE_V}${NC}"
+}
+
+draw_status_bar() {
+    # 1. Capture Data
+    local u=$(whoami)
+    local h=$(hostname)
+    local t=$(date +'%H:%M')
+    
+    # 2. Calculate Length
+    # We create a dummy string to measure the exact length of the text
+    # Format: " User: [15 chars] Host: [15 chars] Time: [10 chars]"
+    local clean_str=$(printf " User: %-15s Host: %-15s Time: %-10s" "$u" "$h" "$t")
+    local str_len=${#clean_str}
+    
+    # 3. Calculate Padding needed to fill the box
+    local pad_len=$(( UI_WIDTH - str_len ))
+    
+    # 4. Print Left Border
+    echo -ne "${BORDER_COLOR}${LINE_V}${NC}"
+    
+    # 5. Print Content with Colors
+    printf " ${GRAY}User:${NC} %-15s ${GRAY}Host:${NC} %-15s ${GRAY}Time:${NC} %-10s" "$u" "$h" "$t"
+    
+    # 6. Print Padding & Right Border
+    printf "%${pad_len}s" ""
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}"
+    
+    # 7. Bottom Border
+    echo -e "${BORDER_COLOR}${CORNER_BL}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${CORNER_BR}${NC}"
 }
 
 # ===================== MAIN MENU =====================
 main_menu(){
-    # Initial Loading Effect
     clear
-    echo -e "${CYAN}Starting Coding Hub Panel...${NC}"
-    sleep 1
+    echo -e "\n${CYAN}Starting Coding Hub Panel...${NC}"
+    sleep 0.5
     loading_bar
-
+    
     while true; do 
         header
-        echo -e "  ${GREEN}:: MAIN MENU ::${NC}"
-        echo -e "${T_TOP}"
-        # Adjusted alignment to fit new width
-        printf "${T_SIDE}  ${WHITE}[01]${NC} %-40s ${WHITE}[05]${NC} %-40s ${T_SIDE}\n" "VPS Run Setup" "Theme Manager"
-        printf "${T_SIDE}  ${WHITE}[02]${NC} %-40s ${WHITE}[06]${NC} %-40s ${T_SIDE}\n" "Panel Manager" "System Options"
-        printf "${T_SIDE}  ${WHITE}[03]${NC} %-40s ${WHITE}[07]${NC} %-40s ${T_SIDE}\n" "Wings Installation" "External Infra"
-        printf "${T_SIDE}  ${WHITE}[04]${NC} %-40s ${RED}[08]${NC} %-40s ${T_SIDE}\n" "Tools Utility" "Exit Panel"
-        echo -e "${T_BOT}"
         
-        echo -e "${GRAY}  Enter the number corresponding to your choice:${NC}"
+        SPACER="                   " # Gap between columns
+        
+        echo -e "${BORDER_COLOR}${LINE_V}${NC}$(printf "%${UI_WIDTH}s" "")${BORDER_COLOR}${LINE_V}${NC}"
+        
+        # Row 1
+        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[01]${NC} ${CYAN}VPS Run Setup${NC}            ${SPACER} ${WHITE}[05]${NC} ${CYAN}Theme Manager${NC}            ${BORDER_COLOR}${LINE_V}${NC}\n"
+        
+        # Row 2
+        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[02]${NC} ${CYAN}Panel Manager${NC}            ${SPACER} ${WHITE}[06]${NC} ${CYAN}System Options${NC}           ${BORDER_COLOR}${LINE_V}${NC}\n"
+        
+        # Row 3
+        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[03]${NC} ${CYAN}Wings Installation${NC}       ${SPACER} ${WHITE}[07]${NC} ${CYAN}External Infra${NC}           ${BORDER_COLOR}${LINE_V}${NC}\n"
+        
+        # Row 4
+        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[04]${NC} ${CYAN}Tools Utility${NC}            ${SPACER} ${RED}[08]${NC} ${RED}Exit Panel${NC}               ${BORDER_COLOR}${LINE_V}${NC}\n"
+        
+        echo -e "${BORDER_COLOR}${LINE_V}${NC}$(printf "%${UI_WIDTH}s" "")${BORDER_COLOR}${LINE_V}${NC}"
+        
+        # Separator before status
+        echo -e "${BORDER_COLOR}${LINE_V}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${LINE_V}${NC}"
+        
+        draw_status_bar
+        
+        echo -e ""
+        echo -e "  ${GRAY}Enter the number corresponding to your choice:${NC}"
         echo -ne "  ${BOLD}${GREEN}root@codinghub:~#${NC} "
         read -p "" c
 
@@ -105,7 +165,10 @@ main_menu(){
                 echo -e ""
                 exit 
                 ;;
-            *) echo -e "  ${RED}Invalid Selection. Try again.${NC}"; sleep 1 ;;
+            *) 
+                echo -e "  ${RED}Invalid Selection. Try again.${NC}"
+                sleep 1 
+                ;;
         esac
     done
 }
