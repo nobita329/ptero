@@ -135,23 +135,21 @@ php app migrate
 # FRONTEND
 # ==============================
 cd /var/www/featherpanel/frontendv2
+pnpm install
 pnpm build
-
+chown -R www-data:www-data /var/www/featherpanel/*
 # ==============================
 # SSL (SELF-SIGNED)
 # ==============================
 mkdir -p /etc/certs/featherpanel
 cd /etc/certs/featherpanel
-
 openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 \
 -subj "/C=NA/ST=NA/L=NA/O=NA/CN=Generic SSL Certificate" \
 -keyout privkey.pem -out fullchain.pem
-
 # ==============================
 # NGINX CONFIG
 # ==============================
 rm -f /etc/nginx/sites-enabled/default
-
 cat <<EOF > /etc/nginx/sites-available/FeatherPanel.conf
 server {
     listen 80;
@@ -208,7 +206,7 @@ EOF
 ln -sf /etc/nginx/sites-available/FeatherPanel.conf /etc/nginx/sites-enabled/FeatherPanel.conf
 nginx -t && systemctl restart nginx
 
-chown -R www-data:www-data /var/www/featherpanel/*
+
 clear
 echo "======================================"
 echo " ✅ FEATHERPANEL LIVE"
