@@ -1,85 +1,76 @@
 #!/bin/bash
 
 # ==================================================
-#  PTERODACTYL WINGS INSTALLER | Production UI
+#  WINGS AUTO-INSTALLER v2.0 | CYBER EDITION
 # ==================================================
 
-# --- COLORS & STYLES ---
+# --- PALETTE ---
 C_RESET='\033[0m'
 C_BOLD='\033[1m'
 C_RED='\033[1;31m'
 C_GREEN='\033[1;32m'
 C_YELLOW='\033[1;33m'
 C_BLUE='\033[1;34m'
+C_PURPLE='\033[1;35m'
 C_CYAN='\033[1;36m'
-C_BG_RED='\033[41m'
-C_BG_GREEN='\033[42m'
+C_WHITE='\033[1;37m'
+C_GRAY='\033[1;90m'
 
-# --- VARIABLES ---
-TOTAL_STEPS=6
-CURRENT_STEP=1
+# --- UI ENGINE ---
 
-# --- UI FUNCTIONS ---
-
-# Hide cursor on start, show on exit
+# Hide Cursor
 trap 'tput cnorm; echo -e "${C_RESET}"' EXIT
 tput civis
 
-header() {
+draw_header() {
     clear
-    echo -e "${C_BLUE}"
-    cat << "EOF"
-    ██╗    ██╗██╗███╗   ██╗ ██████╗ ███████╗
-    ██║    ██║██║████╗  ██║██╔════╝ ██╔════╝
-    ██║ █╗ ██║██║██╔██╗ ██║██║  ███╗███████╗
-    ██║███╗██║██║██║╚██╗██║██║   ██║╚════██║
-    ╚███╔███╔╝██║██║ ╚████║╚██████╔╝███████║
-     ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
-EOF
-    echo -e "    ${C_CYAN}PTERODACTYL WINGS AUTO-INSTALLER${C_RESET}"
-    echo -e "${C_BLUE}──────────────────────────────────────────────────${C_RESET}"
+    local host=$(hostname)
+    local ip=$(hostname -I | awk '{print $1}')
+    local os=$(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')
+    local kernel=$(uname -r)
+
+    echo -e "${C_BLUE}╔══════════════════════════════════════════════════════════════════════╗${C_RESET}"
+    echo -e "${C_BLUE}║${C_RESET} ${C_BOLD}${C_WHITE}PTERODACTYL WINGS INSTALLER${C_RESET} ${C_GRAY}::${C_RESET} ${C_CYAN}AUTOMATION SUITE${C_RESET}               ${C_BLUE}║${C_RESET}"
+    echo -e "${C_BLUE}╠══════════════════════════════════════════════════════════════════════╣${C_RESET}"
+    echo -e "${C_BLUE}║${C_RESET} ${C_GRAY}HOST:${C_RESET} ${C_WHITE}$host${C_RESET}   ${C_GRAY}IP:${C_RESET} ${C_WHITE}$ip${C_RESET}"
+    echo -e "${C_BLUE}║${C_RESET} ${C_GRAY}OS  :${C_RESET} ${C_WHITE}$os${C_RESET}   ${C_GRAY}KER:${C_RESET} ${C_WHITE}$kernel${C_RESET}"
+    echo -e "${C_BLUE}╚══════════════════════════════════════════════════════════════════════╝${C_RESET}"
     echo ""
 }
 
-print_step() {
-    echo -e "${C_BLUE}[${CURRENT_STEP}/${TOTAL_STEPS}]${C_RESET} ${C_BOLD}$1${C_RESET}"
-    ((CURRENT_STEP++))
+msg_step() {
+    echo -e "${C_PURPLE} :: ${C_BOLD}${C_WHITE}$1${C_RESET}"
+    echo -e "${C_GRAY} ──────────────────────────────────────────${C_RESET}"
 }
 
-print_status() {
-    # $1 = Message, $2 = Command to run
+# $1 = Message, $2 = Command
+run_task() {
     local msg="$1"
     local cmd="$2"
     local pid
-    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local spin='-\|/'
+    local i=0
+
+    echo -ne "   ${C_CYAN}➜${C_RESET} $msg... "
     
-    echo -ne "  ${C_CYAN}➜${C_RESET} $msg... "
-    
-    # Run command in background, silence output
+    # Run command silently
     eval "$cmd" > /dev/null 2>&1 &
     pid=$!
-    
-    # Spinner loop
+
     while kill -0 $pid 2>/dev/null; do
-        local temp=${spinstr#?}
-        printf " ${C_BLUE}%c${C_RESET}" "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
+        i=$(( (i+1) %4 ))
+        printf "\b${C_BLUE}${spin:$i:1}${C_RESET}"
         sleep 0.1
-        printf "\b\b"
     done
+    
     wait $pid
     local exit_code=$?
-    
-    # Print Result Tag (Right Aligned)
+
     if [ $exit_code -eq 0 ]; then
-        printf "\r\033[60C[ ${C_GREEN}OK${C_RESET} ]\n"
-        # Reprint message to clean up spinner artifacts
-        tput cuu1
-        echo -e "  ${C_GREEN}✔${C_RESET} $msg"
+        printf "\r   ${C_GREEN}✔${C_RESET} $msg                                \n"
     else
-        printf "\r\033[60C[${C_RED}FAIL${C_RESET}]\n"
-        echo -e "  ${C_RED}✖${C_RESET} $msg failed."
-        echo -e "${C_YELLOW}Check logs for details.${C_RESET}"
+        printf "\r   ${C_RED}✖${C_RESET} $msg ${C_RED}[FAILED]${C_RESET}\n"
+        echo -e "\n${C_RED}Error executing: $cmd${C_RESET}"
         exit 1
     fi
 }
@@ -90,64 +81,66 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-header
+draw_header
 
 # ------------------------
-# 1. Docker Installation
+# 1. DOCKER SETUP
 # ------------------------
-print_step "Container Engine Setup"
+msg_step "CONTAINER ENGINE SETUP"
+
 if ! command -v docker >/dev/null 2>&1; then
-    print_status "Downloading Docker script" "curl -sSL https://get.docker.com/ -o /tmp/get-docker.sh"
-    print_status "Installing Docker (This may take time)" "sh /tmp/get-docker.sh"
-    print_status "Enabling Docker service" "systemctl enable --now docker"
+    run_task "Downloading Docker Script" "curl -sSL https://get.docker.com/ -o /tmp/get-docker.sh"
+    run_task "Installing Docker Engine" "sh /tmp/get-docker.sh"
+    run_task "Enabling Docker Service" "systemctl enable --now docker"
 else
-    echo -e "  ${C_GREEN}✔${C_RESET} Docker is already installed"
+    echo -e "   ${C_GREEN}✔${C_RESET} Docker is already installed."
 fi
 echo ""
 
 # ------------------------
-# 2. System Configuration
+# 2. SYSTEM CONFIG
 # ------------------------
-print_step "System Configuration"
+msg_step "SYSTEM CONFIGURATION"
+
 GRUB_FILE="/etc/default/grub"
 if [ -f "$GRUB_FILE" ]; then
-    # Only update if not already set
     if ! grep -q "swapaccount=1" "$GRUB_FILE"; then
-        print_status "Enabling Swap Accounting (GRUB)" "sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"swapaccount=1\"/' $GRUB_FILE"
-        print_status "Updating GRUB configuration" "update-grub"
+        run_task "Enabling Swap Accounting" "sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"swapaccount=1\"/' $GRUB_FILE"
+        run_task "Updating GRUB Config" "update-grub"
     else
-        echo -e "  ${C_GREEN}✔${C_RESET} Swap accounting already enabled"
+        echo -e "   ${C_GREEN}✔${C_RESET} Swap Accounting active."
     fi
 else
-    echo -e "  ${C_YELLOW}⚠${C_RESET} GRUB file not found, skipping..."
+    echo -e "   ${C_YELLOW}⚠${C_RESET} GRUB not found (Container?). Skipping."
 fi
 echo ""
 
 # ------------------------
-# 3. Wings Binary
+# 3. WINGS BINARY
 # ------------------------
-print_step "Installing Wings"
-print_status "Preparing directories" "mkdir -p /etc/pterodactyl"
+msg_step "WINGS BINARY INSTALLATION"
+
+run_task "Creating Directories" "mkdir -p /etc/pterodactyl"
 
 ARCH=$(uname -m)
 if [ "$ARCH" == "x86_64" ]; then 
-    ARCH="amd64"
-else 
-    ARCH="arm64"
+    DL_URL="https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64"
+elif [ "$ARCH" == "aarch64" ]; then
+    DL_URL="https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_arm64"
+else
+    echo -e "   ${C_RED}✖ Unsupported Architecture: $ARCH${C_RESET}"
+    exit 1
 fi
-echo -e "  ${C_CYAN}➜${C_RESET} Architecture detected: ${C_BOLD}$ARCH${C_RESET}"
 
-print_status "Downloading Wings binary" "curl -L -o /usr/local/bin/wings 'https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$ARCH'"
-print_status "Setting executable permissions" "chmod u+x /usr/local/bin/wings"
+run_task "Downloading Binary ($ARCH)" "curl -L -o /usr/local/bin/wings '$DL_URL'"
+run_task "Setting Permissions" "chmod u+x /usr/local/bin/wings"
 echo ""
 
 # ------------------------
-# 4. Service Setup
+# 4. SERVICE SETUP
 # ------------------------
-print_step "Service Configuration"
-WINGS_SERVICE_FILE="/etc/systemd/system/wings.service"
+msg_step "SERVICE CONFIGURATION"
 
-# Create service file content
 cat <<EOF > /tmp/wings.service
 [Unit]
 Description=Pterodactyl Wings Daemon
@@ -170,23 +163,25 @@ RestartSec=5s
 WantedBy=multi-user.target
 EOF
 
-print_status "Creating systemd service" "mv /tmp/wings.service $WINGS_SERVICE_FILE"
-print_status "Reloading system daemon" "systemctl daemon-reload"
-print_status "Enabling Wings on boot" "systemctl enable wings"
+run_task "Creating Systemd Unit" "mv /tmp/wings.service /etc/systemd/system/wings.service"
+run_task "Reloading Daemon" "systemctl daemon-reload"
+run_task "Enabling Wings on Boot" "systemctl enable wings"
 echo ""
 
 # ------------------------
-# 5. SSL Generation
+# 5. SSL SETUP
 # ------------------------
-print_step "Security Configuration"
-print_status "Creating certificate directory" "mkdir -p /etc/certs/wing"
-print_status "Generating self-signed SSL" "openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj '/C=NA/ST=NA/L=NA/O=NA/CN=Generic SSL Certificate' -keyout /etc/certs/wing/privkey.pem -out /etc/certs/wing/fullchain.pem"
+msg_step "SECURITY & SSL"
+
+run_task "Creating Cert Directory" "mkdir -p /etc/certs/wing"
+run_task "Generating Self-Signed Cert" "openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj '/C=NA/ST=NA/L=NA/O=NA/CN=Generic SSL Certificate' -keyout /etc/certs/wing/privkey.pem -out /etc/certs/wing/fullchain.pem"
 echo ""
 
 # ------------------------
-# 6. Helper Script
+# 6. HELPER SCRIPT
 # ------------------------
-print_step "Finalizing"
+msg_step "FINALIZING"
+
 cat <<'EOF' > /usr/local/bin/wing
 #!/bin/bash
 BLUE='\033[0;34m'
@@ -200,17 +195,18 @@ echo "  status   : systemctl status wings"
 echo ""
 EOF
 
-print_status "Installing 'wing' helper command" "chmod +x /usr/local/bin/wing"
+run_task "Installing 'wing' Shortcut" "chmod +x /usr/local/bin/wing"
 echo ""
 
 # ------------------------
-# COMPLETE
+# COMPLETION
 # ------------------------
-echo -e "${C_BLUE}──────────────────────────────────────────────────${C_RESET}"
-echo -e "${C_GREEN}${C_BOLD}   ✅  INSTALLATION COMPLETE${C_RESET}"
-echo -e "${C_BLUE}──────────────────────────────────────────────────${C_RESET}"
+echo -e "${C_GREEN}${C_BOLD}  ✅ INSTALLATION SUCCESSFUL${C_RESET}"
+echo -e "${C_GRAY}  ──────────────────────────────────────────${C_RESET}"
+echo -e "  ${C_WHITE}Next Steps:${C_RESET}"
+echo -e "  1. Configure your node in the Panel."
+echo -e "  2. Paste the configuration content into: ${C_CYAN}/etc/pterodactyl/config.yml${C_RESET}"
+echo -e "  3. Start wings: ${C_GREEN}systemctl start wings${C_RESET}"
 echo ""
-echo -e "   ${C_CYAN}To start Wings:${C_RESET}    sudo systemctl start wings"
-echo -e "   ${C_CYAN}To view logs:${C_RESET}      sudo journalctl -u wings -f"
-echo -e "   ${C_CYAN}Helper tool:${C_RESET}       Type ${C_BOLD}wing${C_RESET} in terminal"
+echo -e "  ${C_GRAY}Shortcut command installed: Type ${C_WHITE}wing${C_GRAY} to manage the service.${C_RESET}"
 echo ""
