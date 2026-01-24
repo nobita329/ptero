@@ -114,6 +114,9 @@ while true; do
        sudo systemctl restart panel.service 
        php artisan up
        ;; 
+    4)
+       bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/Jexactyl/Migration.sh)
+       ;;
     0) 
        echo -e "\n${M} 👋 Exiting Jexactyl Manager.${N}"
        exit 0 
