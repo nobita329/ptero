@@ -77,7 +77,7 @@ header(){
     echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
     echo
     echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${WHITE}CODING HUB CONTROL PANEL v3.5${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${WHITE}CODING HUB CONTROL PANEL v4.0${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
     echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${BOLD}>> DEVELOPED BY NOBITA (2026) <<${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
     
     # Separator
