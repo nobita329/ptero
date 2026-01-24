@@ -156,7 +156,6 @@ server {
     }
 }
 EOF
-rm /etc/nginx/sites-available/default; rm /etc/nginx/sites-enabled/default
 ln -s /etc/nginx/sites-available/panel.conf /etc/nginx/sites-enabled/panel.conf || true
 nginx -t && systemctl restart nginx
 
