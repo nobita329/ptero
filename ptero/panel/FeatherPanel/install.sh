@@ -135,8 +135,7 @@ php app migrate
 # ==============================
 # FRONTEND
 # ==============================
-cd /var/www/featherpanel/frontendv2
-pnpm install
+cd /var/www/featherpanel/frontend
 pnpm build
 chown -R www-data:www-data /var/www/featherpanel/*
 # ==============================
