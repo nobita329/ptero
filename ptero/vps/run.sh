@@ -143,7 +143,7 @@ lxc_setup() {
         echo -e "${Y}Installing LXD...${N}"
         sudo usermod -aG lxd $USER
         sudo usermod -aG lxd root
-        bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/lxc.sh)
+        bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/panel/lxcc.sh)
         echo -e "${G}✅ Installed. Please logout/login.${N}"
     else
         echo -e "${G}✔ LXD is already installed.${N}"
