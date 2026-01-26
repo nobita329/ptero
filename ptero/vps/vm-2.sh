@@ -9,7 +9,8 @@ CYAN='\033[0;36m'
 B_CYAN='\033[1;36m'
 WHITE='\033[1;97m'
 BG_CYAN='\033[46m'
-NC='\033[0m' # No Color
+BOLD='\033[1m'      # Added this to fix the crash
+NC='\033[0m'        # No Color
 
 # =============================
 # Enhanced Multi-VM Manager (Pure QEMU Version)
@@ -38,12 +39,12 @@ EOF
 EOF
     
     # Bottom Status Bar
+    # Fixed the BOLD variable here
     echo -e "${NC}${BG_CYAN}${WHITE}${BOLD}  SYSTEM MANAGER ACTIVE  ${NC} ${CYAN}▶ Pure QEMU Environment${NC}"
     echo -e "${B_CYAN} ---------------------------------------------------------------------------${NC}"
     echo
-    echo
-
 }
+
 # Run the header
 display_header
 # Function to display colored output with emojis
