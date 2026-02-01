@@ -80,7 +80,7 @@ tools_menu() {
                 pause ;;
             5) 
                 echo -e "\n${YELLOW}Running VPS Optimizer...${NC}"
-                bash <(curl -s https://raw.githubusercontent.com/nobita54/-150/refs/heads/main/tools/vps.sh) 
+                bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/localtonet.sh) 
                 pause ;;
             6) 
                 echo -e "\n${YELLOW}Installing Web Terminal...${NC}"
