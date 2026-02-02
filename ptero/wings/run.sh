@@ -113,14 +113,11 @@ ssl_setup() {
 
     echo -e "\n${Y}➜ Installing Dependencies...${N}"
     apt update -y >/dev/null 2>&1
-    apt install -y mysql-server mariadb-server certbot python3-certbot-nginx >/dev/null 2>&1
+    apt install -y certbot python3-certbot-nginx > /dev/null 2>&1
     
-    echo -e "${Y}➜ Enabling Services...${N}"
-    systemctl enable --now mysql >/dev/null 2>&1
-    systemctl enable --now mariadb >/dev/null 2>&1
 
     echo -e "${Y}➜ Requesting Certificate for ${W}$DOMAIN${Y}...${N}"
-    certbot certonly --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "admin@$DOMAIN"
+    certbot certonly --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "ssl$(tr -dc a-z0-9 </dev/urandom | head -c6)@$DOMAIN"
     
     echo -e "\n${G}✔ SSL Setup Complete.${N}"
     read -p "Press Enter to return..."
