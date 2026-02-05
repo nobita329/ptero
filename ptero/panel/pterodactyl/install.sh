@@ -260,7 +260,7 @@ echo "APP_ENVIRONMENT_ONLY=false" >> .env
 sed -i '/^APP_THEME=/d' .env
 sed -i '/^APP_TIMEZONE=/d' .env
 sed -i '/^MAIL_/d' .env
-echo "APP_THEME=Nobita-hosting" >> .env
+echo "APP_THEME=Coding hub" >> .env
 # Auto detect timezone
 TIMEZONE=$(timedatectl show --property=Timezone --value)
 echo "APP_TIMEZONE=${TIMEZONE}" >> .env
@@ -272,7 +272,7 @@ echo "MAIL_USERNAME=no.reply@editorxprress.site" >> .env
 echo "MAIL_PASSWORD=58@S5wZuWtpdDDX" >> .env
 echo "MAIL_ENCRYPTION=tls" >> .env
 echo "MAIL_FROM_ADDRESS=no.reply@editorxprress.site" >> .env
-echo 'MAIL_FROM_NAME="Nobita-hosting"' >> .env
+echo 'MAIL_FROM_NAME="Coding hub"' >> .env
 php artisan p:user:make
 
 # ---------------- DONE ----------------
