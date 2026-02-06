@@ -1,178 +1,81 @@
 #!/bin/bash
 # ===========================================================
-# CODING HUB Terminal Control Panel (v3.5 - Stable Fix)
-# UI Layout: Fixed Left | Colors: Old (Standard)
+# CODING HUB - NEON CYBER DASHBOARD (v8.0)
+# Style: Random Synthwave | Grid: High-Tech | Dev: Nobita
 # ===========================================================
 
-# --- 1. COLORS ---
-RED='\033[1;31m'
-GREEN='\033[1;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[1;34m'
-PURPLE='\033[1;35m'
-CYAN='\033[1;36m'
-WHITE='\033[1;37m'
-GRAY='\033[1;30m'
+# --- 1. NEON RANDOM PALETTE ---
+CYAN='\033[38;5;51m'
+MAGENTA='\033[38;5;201m'
+GOLD='\033[38;5;220m'
+ACID_GREEN='\033[38;5;118m'
+SKY_BLUE='\033[38;5;39m'
+CRIMSON='\033[38;5;196m'
+W='\033[1;37m'
 NC='\033[0m'
-BOLD='\033[1m'
 
-# --- 2. UI CONFIGURATION ---
-BORDER_COLOR=$GRAY
-LOGO_COLOR=$CYAN
-ACCENT_COLOR=$BLUE
-TEXT_COLOR=$WHITE
-
-# Box Drawing Characters
-CORNER_TL="┌"
-CORNER_TR="┐"
-CORNER_BL="└"
-CORNER_BR="┘"
-LINE_H="─"
-LINE_V="│"
-
-# FIXED WIDTH (Matches the large banner size)
-UI_WIDTH=98
-
-# ===================== HELPER FUNCTIONS =====================
-
-center_text_inner() {
-    local text="$1"
-    # Remove color codes to measure length
-    local clean_text=$(echo -e "$text" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g")
-    local text_len=${#clean_text}
-    
-    # Calculate padding to center text INSIDE the box
-    local padding=$(( (UI_WIDTH - text_len) / 2 ))
-    
-    printf "%${padding}s" ""
-    echo -ne "$text"
-    
-    local remaining=$(( UI_WIDTH - padding - text_len ))
-    printf "%${remaining}s" ""
+# --- 2. DATA COLLECTION ---
+get_stats() {
+    CPU=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%.0f", $2+$4}')
+    RAM=$(free | grep Mem | awk '{printf "%.0f", $3*100/$2}')
+    UPT=$(uptime -p | sed 's/up //; s/ minutes/m/; s/ hours/h/; s/ days/d/')
+    IP=$(hostname -I | awk '{print $1}')
 }
 
-loading_bar() {
-    echo -ne "\n${CYAN}  Loading: ${NC}[ "
-    for i in {1..40}; do
-        echo -ne "${GREEN}▓${NC}"
-        sleep 0.01
-    done
-    echo -e " ] ${GREEN}Done!${NC}\n"
-    sleep 0.3
-}
-
-# ===================== HEADER & DASHBOARD =====================
-header(){
+# --- 3. UI RENDERER ---
+render_ui() {
     clear
-    # Top Border
-    echo -e "${BORDER_COLOR}${CORNER_TL}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${CORNER_TR}${NC}"
+    get_stats
     
-    # --- LOGO AREA ---
-    echo
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR} ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗     ██╗  ██╗██╗   ██╗██████╗ ${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR}██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝     ██║  ██║██║   ██║██╔══██╗${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${ACCENT_COLOR}██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗    ███████║██║   ██║██████╔╝${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${ACCENT_COLOR}██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║    ██╔══██║██║   ██║██╔══██╗${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR}╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝    ██║  ██║╚██████╔╝██████╔╝${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${LOGO_COLOR} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${WHITE}CODING HUB CONTROL PANEL v4.0${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}$(center_text_inner "${BOLD}>> DEVELOPED BY NOBITA (2026) <<${NC}")  ${BORDER_COLOR}${LINE_V}${NC}"
+    # --- CYBER GLOW HEADER ---
+    echo -e "  ${MAGENTA}◈${NC} ${CYAN}TERMINAL_ACCESS${NC} ${MAGENTA}◈${NC} ${GOLD}HUB_OS V 4.1${NC} ${MAGENTA}◈${NC}"
+    echo -e "${SKY_BLUE}◸${W}$(printf '%.0s━' {1..74})${SKY_BLUE}◹${NC}"
     
-    # Separator
-    echo -e "${BORDER_COLOR}${LINE_V}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${LINE_V}${NC}"
+    # --- LOGO (RANDOM NEON GRADIENT) ---
+    echo -e "${CYAN} ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗     ██╗  ██╗██╗   ██╗██████╗ ${NC}"
+    echo -e "${CYAN}██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝     ██║  ██║██║   ██║██╔══██╗${NC}"
+    echo -e "${MAGENTA}██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗    ███████║██║   ██║██████╔╝${NC}"
+    echo -e "${MAGENTA}██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║    ██╔══██║██║   ██║██╔══██╗${NC}"
+    echo -e "${GOLD}╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝    ██║  ██║╚██████╔╝██████╔╝${NC}"
+    echo -e "${GOLD} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}"
+    
+    echo -e "${SKY_BLUE}╟$(printf '%.0s─' {1..74})╢${NC}"
+    
+    # --- SYSTEM METRICS GRID ---
+    printf "  ${GOLD}⬡ CPU:${NC} ${W}%-4s${NC} ${MAGENTA}⬡ RAM:${NC} ${W}%-4s${NC} ${ACID_GREEN}⬡ UPTIME:${NC} ${W}%-10s${NC} ${CYAN}⬡ IP:${NC} ${W}%-15s${NC}\n" "$CPU%" "$RAM%" "$UPT" "$IP"
+    
+    echo -e "${SKY_BLUE}╟──────────────┬───────────────────────────────┬────────────────────────────╢${NC}"
+    
+    # --- MAIN OPTIONS ---
+    echo -e "  ${SKY_BLUE}│${NC} ${GOLD}CONTROL${NC}     ${SKY_BLUE}│${NC} ${W}[01] VPS Run Setup           ${SKY_BLUE}│${NC} ${W}[05] Theme Manager      ${SKY_BLUE}│${NC}"
+    echo -e "  ${SKY_BLUE}│${NC} ${SKY_BLUE}───────────${NC} ${SKY_BLUE}│${NC} ${W}[02] Panel Manager           ${SKY_BLUE}│${NC} ${W}[06] System Options     ${SKY_BLUE}│${NC}"
+    echo -e "  ${SKY_BLUE}│${NC} ${MAGENTA}NETWORK${NC}     ${SKY_BLUE}│${NC} ${W}[03] Wings Installation      ${SKY_BLUE}│${NC} ${W}[07] NO-KVM Mode        ${SKY_BLUE}│${NC}"
+    echo -e "  ${SKY_BLUE}│${NC} ${SKY_BLUE}───────────${NC} ${SKY_BLUE}│${NC} ${W}[04] Utility Tools           ${SKY_BLUE}│${NC} ${CRIMSON}[08] EXIT SYSTEM        ${SKY_BLUE}│${NC}"
+    
+    echo -e "${SKY_BLUE}╘$(printf '%.0s━' {1..74})╛${NC}"
+    
+    # --- PROMPT ---
+    echo -e "  ${MAGENTA}»${NC} ${GOLD}User:${NC} ${W}$(whoami)${NC} ${MAGENTA}»${NC} ${ACID_GREEN}Status:${NC} ${W}Operational${NC}"
+    echo -ne "  ${CYAN}⚡${NC} ${W}root@hub${NC}:${MAGENTA}#${NC} "
 }
 
-draw_status_bar() {
-    # 1. Capture Data
-    local u=$(whoami)
-    local h=$(hostname)
-    local t=$(date +'%H:%M')
-    
-    # 2. Calculate Length
-    # We create a dummy string to measure the exact length of the text
-    # Format: " User: [15 chars] Host: [15 chars] Time: [10 chars]"
-    local clean_str=$(printf " User: %-15s Host: %-15s Time: %-10s" "$u" "$h" "$t")
-    local str_len=${#clean_str}
-    
-    # 3. Calculate Padding needed to fill the box
-    local pad_len=$(( UI_WIDTH - str_len ))
-    
-    # 4. Print Left Border
-    echo -ne "${BORDER_COLOR}${LINE_V}${NC}"
-    
-    # 5. Print Content with Colors
-    printf " ${GRAY}User:${NC} %-15s ${GRAY}Host:${NC} %-15s ${GRAY}Time:${NC} %-10s" "$u" "$h" "$t"
-    
-    # 6. Print Padding & Right Border
-    printf "%${pad_len}s" ""
-    echo -e "${BORDER_COLOR}${LINE_V}${NC}"
-    
-    # 7. Bottom Border
-    echo -e "${BORDER_COLOR}${CORNER_BL}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${CORNER_BR}${NC}"
-}
-
-# ===================== MAIN MENU =====================
-main_menu(){
-    clear
-    echo -e "\n${CYAN}Starting Coding Hub Panel...${NC}"
-    sleep 0.5
-    loading_bar
-    
-    while true; do 
-        header
-        
-        SPACER="                   " # Gap between columns
-        
-        echo -e "${BORDER_COLOR}${LINE_V}${NC}$(printf "%${UI_WIDTH}s" "")${BORDER_COLOR}${LINE_V}${NC}"
-        
-        # Row 1
-        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[01]${NC} ${CYAN}VPS Run Setup${NC}            ${SPACER} ${WHITE}[05]${NC} ${CYAN}Theme Manager${NC}            ${BORDER_COLOR}${LINE_V}${NC}\n"
-        
-        # Row 2
-        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[02]${NC} ${CYAN}Panel Manager${NC}            ${SPACER} ${WHITE}[06]${NC} ${CYAN}System Options${NC}           ${BORDER_COLOR}${LINE_V}${NC}\n"
-        
-        # Row 3
-        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[03]${NC} ${CYAN}Wings Installation${NC}       ${SPACER} ${WHITE}[07]${NC} ${CYAN}NO KVM${NC}           ${BORDER_COLOR}${LINE_V}${NC}\n"
-        
-        # Row 4
-        printf "${BORDER_COLOR}${LINE_V}${NC}    ${WHITE}[04]${NC} ${CYAN}Tools Utility${NC}            ${SPACER} ${RED}[08]${NC} ${RED}Exit Panel${NC}               ${BORDER_COLOR}${LINE_V}${NC}\n"
-        
-        echo -e "${BORDER_COLOR}${LINE_V}${NC}$(printf "%${UI_WIDTH}s" "")${BORDER_COLOR}${LINE_V}${NC}"
-        
-        # Separator before status
-        echo -e "${BORDER_COLOR}${LINE_V}$(printf '%.0s─' $(seq 1 $UI_WIDTH))${LINE_V}${NC}"
-        
-        draw_status_bar
-        
-        echo -e ""
-        echo -e "  ${GRAY}Enter the number corresponding to your choice:${NC}"
-        echo -ne "  ${BOLD}${GREEN}root@codinghub:~#${NC} "
-        read -p "" c
-
-        case $c in
-            1) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/run.sh) ;;
-            2) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/run.sh) ;;
-            3) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/wings/run.sh) ;;
-            4) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/run.sh) ;;
-            5) loading_bar; bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/thame/chang/dev.sh) ;;
-            6) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/The-Coding-Hub/refs/heads/main/srv/menu/System1.sh) ;;
-            7) loading_bar; bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/run.sh) ;;
-            8) 
-                echo -e ""
-                echo -e "  ${GREEN}Thank you for using CODING HUB!${NC}"
-                echo -e "  ${GRAY}See you soon, Nobita.${NC}"
-                echo -e ""
-                exit 
-                ;;
-            *) 
-                echo -e "  ${RED}Invalid Selection. Try again.${NC}"
-                sleep 1 
-                ;;
-        esac
-    done
-}
-
-# Start the script
-main_menu
+# --- 4. MAIN LOOP ---
+while true; do
+    render_ui
+    read -r opt
+    case $opt in
+        1) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/run.sh) ;;
+        2) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/run.sh) ;;
+        3) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/wings/run.sh) ;;
+        4) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/run.sh) ;;
+        5) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/thame/chang/dev.sh) ;;
+        6) bash <(curl -s https://raw.githubusercontent.com/nobita329/The-Coding-Hub/refs/heads/main/srv/menu/System1.sh) ;;
+        7) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/run.sh) ;;
+        8|exit) 
+            echo -e "\n  ${MAGENTA}System Offline.${NC} Goodbye, Nobita.\n"
+            exit 0 ;;
+        *) 
+            echo -e "  ${CRIMSON}![Error] Unknown Command${NC}"
+            sleep 0.5 ;;
+    esac
+done
