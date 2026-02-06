@@ -102,7 +102,7 @@ ssl_setup() {
     
     # Auto-fill domain if possible or ask
     echo -e "${C}│${N} Auto-detected IP: ${G}$PUBLIC_IP${N}"
-    echo -ne "${C}└─╼ ${W}Enter Domain (e.g., panel.host.com): ${N}"
+    echo -ne "${C}└─╼ ${W}Enter Domain (e.g., Node.host.com): ${N}"
     read DOMAIN
 
     if [[ -z "$DOMAIN" ]]; then
