@@ -211,4 +211,3 @@ main() {
 }
 
 main "$@"
-bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/vm-2.sh)
