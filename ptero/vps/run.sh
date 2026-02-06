@@ -97,7 +97,6 @@ run_vm_1() {
 run_vm_2() {
     echo -e "${M}🌐 LAUNCHING VM 2 (NO KVM MODE)...${N}"
     bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/auto.sh)
-    bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/vps/vm-2.sh)
     pause
 }
 
