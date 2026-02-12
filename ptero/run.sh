@@ -1,122 +1,70 @@
 #!/usr/bin/env bash
-# ==================================================
-#  NOBITA SECURE LOADER | BOOTSTRAP SYSTEM (FIXED)
-# ==================================================
+# ==========================================================
+#  NOBITA CLOUD SYSTEM | BANE-ANMESH 3S UPLINK
+#  DATE: 2026-02-12 | UI-TYPE: ASC-II HYPER-VISUAL
+# ==========================================================
 set -euo pipefail
 
-# --- COLORS & STYLES ---
-C_RESET='\033[0m'
-C_BOLD='\033[1m'
-C_RED='\033[1;31m'
-C_GREEN='\033[1;32m'
-C_YELLOW='\033[1;33m'
-C_BLUE='\033[1;34m'
-C_PURPLE='\033[1;35m'
-C_CYAN='\033[1;36m'
-C_WHITE='\033[1;37m'
-C_GRAY='\033[1;90m'
+# --- BANE UI THEME ---
+R='\033[1;31m'   # Crimson
+G='\033[1;32m'   # Emerald
+Y='\033[1;33m'   # Gold
+C='\033[1;36m'   # Cyan
+W='\033[1;37m'   # Pure White
+DG='\033[1;90m'  # Steel Gray
+NC='\033[0m'     # Reset
 
 # --- CONFIG ---
-URL="https://run.nobitahost.in"
 HOST="run.nobitahost.in"
+URL="https://${HOST}"
 NETRC="${HOME}/.netrc"
-
-# --- CREDENTIALS ---
 IP="65.0.86.121"
 LOCL_IP="10.1.0.29"
-USER_LOGIN="nobita.dev"      # Mapped from logic below
-USER_PASS="admin@codinghub.host" # Mapped from logic below
 
-# --- UI FUNCTIONS ---
-draw_header() {
+draw_banner() {
     clear
-    echo -e "${C_PURPLE}╔════════════════════════════════════════════════════════════╗${C_RESET}"
-    echo -e "${C_PURPLE}║${C_RESET} ${C_BOLD}${C_WHITE}NOBITA CLOUD UPLINK${C_RESET} ${C_GRAY}::${C_RESET} ${C_CYAN}SECURE BOOTSTRAP${C_RESET}                 ${C_PURPLE}║${C_RESET}"
-    echo -e "${C_PURPLE}╚════════════════════════════════════════════════════════════╝${C_RESET}"
-    echo -e "${C_GRAY}  Target Host: ${C_WHITE}$HOST${C_RESET}"
+    echo -e "${G}"
+    cat << "EOF"
+ ██████  █████           █████      ███   █████                   █████████  ████                          █████
+░░██████ ░░███           ░░███      ░░░   ░░███                   ███░░░░░███░░███                         ░░███ 
+ ░███░███ ░███   ██████   ░███████  ████  ███████    ██████      ███     ░░░  ░███   ██████  █████ ████  ███████ 
+ ░███░░███░███  ███░░███  ░███░░███░░███ ░░░███░    ░░░░░███    ░███          ░███  ███░░███░░███ ░███  ███░░███ 
+ ░███ ░░██████ ░███ ░███  ░███ ░███ ░███   ░███      ███████    ░███          ░███ ░███ ░███ ░███ ░███ ░███ ░███ 
+ ░███  ░░█████ ░███ ░███  ░███ ░███ ░███   ░███ ███ ███░░███    ░░███     ███ ░███ ░███ ░███ ░███ ░███ ░███ ░███ 
+ █████  ░░█████░░██████   ████████  █████  ░░█████ ░░████████    ░░█████████  █████░░██████  ░░████████░░████████
+░░░░░    ░░░░░  ░░░░░░   ░░░░░░░░  ░░░░░    ░░░░░   ░░░░░░░░      ░░░░░░░░░  ░░░░░  ░░░░░░    ░░░░░░░░  ░░░░░░░░ 
+EOF
+    echo -e "${NC}"
+    echo -e "   ${R}──[ ${W}ANMESH 3s${R} ]${NC}${DG}───────────────────────────────────────────${NC}"
+    echo -e "   ${DG}NODE:${NC} ${W}$IP${NC}  ${R}│${NC}  ${DG}PORT:${NC} ${G}V-3S${NC}  ${R}│${NC}  ${DG}STATUS:${NC} ${G}ENCRYPTED${NC}"
     echo ""
 }
 
-msg_info() { echo -e "  ${C_BLUE}➜${C_RESET} $1"; }
-msg_ok()   { echo -e "  ${C_GREEN}✔${C_RESET} $1"; }
-msg_err()  { echo -e "  ${C_RED}✖${C_RESET} $1"; }
+# --- PROCESS LOGIC ---
+draw_banner
 
-# Spinner Animation
-spinner() {
-    local pid=$1
-    local delay=0.1
-    local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
+# 1. Setup Auth
+echo -ne "   ${R}➤${NC} ${W}Linking Nobita Credentials...${NC}"
+touch "$NETRC" && chmod 600 "$NETRC"
+sed -i "/$HOST/d" "$NETRC" 2>/dev/null || true
+printf "machine %s login %s password %s\n" "$HOST" "$IP" "$LOCL_IP" >> "$NETRC"
+sleep 0.5
+echo -e " ${G}[SUCCESS]${NC}"
 
-# --- MAIN LOGIC ---
-draw_header
+# 2. Uplink Connection
+echo -ne "   ${R}➤${NC} ${W}Establishing Bane Uplink...${NC}  "
+payload="$(mktemp)"
+trap "rm -f $payload" EXIT
 
-# 1. Dependency Check
-if ! command -v curl >/dev/null 2>&1; then
-    msg_err "Dependency Missing: curl"
-    exit 1
-fi
-
-# 2. Configure Auth
-msg_info "Configuring Secure Credentials..."
-
-# Create/Secure file
-touch "$NETRC"
-chmod 600 "$NETRC"
-
-# Clean old entries for this specific host
-tmpfile="$(mktemp)"
-grep -vE "^[[:space:]]*machine[[:space:]]+${HOST}([[:space:]]+|$)" "$NETRC" > "$tmpfile" || true
-mv "$tmpfile" "$NETRC"
-
-# Inject Credentials
-# Note: Using variables defined above. 
-# Based on your comments, it seems you want $IP as login and $LOCL_IP as password?
-# If you actually meant user="nobita.dev", switch the variables below.
-{
-    printf 'machine %s ' "$HOST"
-    printf 'login %s ' "$IP"
-    printf 'password %s\n' "$LOCL_IP"
-} >> "$NETRC"
-
-msg_ok "Authentication Token Generated."
-
-# 3. Download Payload
-script_file="$(mktemp)"
-cleanup() { rm -f "$script_file"; }
-trap cleanup EXIT
-
-echo -ne "  ${C_CYAN}➜${C_RESET} Establishing Downlink... "
-
-# Run curl in background to show spinner
-# -L follows redirects, -A mimics browser to avoid some 403s
-(curl -fsSL -A "Mozilla/5.0" --netrc -o "$script_file" "$URL") &
-spinner $!
-wait $!
-EXIT_CODE=$?
-
-if [ $EXIT_CODE -eq 0 ]; then
-    echo -e " ${C_GREEN}OK${C_RESET}"
-    msg_ok "Payload Received Successfully."
-    echo ""
-    echo -e "${C_PURPLE}  [ SYSTEM ]${C_RESET} Executing Remote Script..."
-    sleep 1
-    
-    # Handover control to the downloaded script
-    bash "$script_file"
+# Use a silent curl with the injected netrc
+if curl -fsSL -A "Bane-3s-Agent" --netrc -o "$payload" "$URL"; then
+    echo -e "${G}CONNECTED${NC}"
+    echo -e "   ${DG}────────────────────────────────────────────────────────${NC}"
+    echo -e "   ${W}Starting execution in 3s...${NC}"
+    sleep 3
+    bash "$payload"
 else
-    echo -e " ${C_RED}FAIL${C_RESET}"
-    msg_err "Download Failed. Check network or credentials."
-    
-    # Debug hint
-    echo -e "${C_GRAY}  Debug Info: Ensure IPs in .netrc match server expectations.${C_RESET}"
+    echo -e "${R}FAILED${NC}"
+    echo -e "\n   ${R}[!]${NC} Error: Could not reach Nobita Host. Check Keys."
     exit 1
 fi
