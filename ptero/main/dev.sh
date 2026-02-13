@@ -1,65 +1,74 @@
 #!/bin/bash
 # ===========================================================
-# CODING HUB - NEON CYBER DASHBOARD (v8.0)
-# Style: Random Synthwave | Grid: High-Tech | Dev: Nobita
+# CODING HUB - OBSIDIAN NEXT GEN (v11.2 - Custom Banner)
+# Style: Segmented UI / Glass-Look / Nobita Edition
 # ===========================================================
 
-# --- 1. NEON RANDOM PALETTE ---
-CYAN='\033[38;5;51m'
-MAGENTA='\033[38;5;201m'
+# --- 0. PRE-INITIALIZATION ---
+# Change hostname to Nobita before rendering
+hostnamectl set-hostname Nobita 2>/dev/null
+
+# --- PRECISE COLORS ---
+B_BLUE='\033[1;38;5;33m'
+B_CYAN='\033[1;38;5;51m'
+B_PURPLE='\033[1;38;5;141m'
+B_GREEN='\033[1;38;5;82m'
+B_RED='\033[1;38;5;196m'
 GOLD='\033[38;5;220m'
-ACID_GREEN='\033[38;5;118m'
-SKY_BLUE='\033[38;5;39m'
-CRIMSON='\033[38;5;196m'
-W='\033[1;37m'
+W='\033[1;38;5;255m'
+G='\033[0;38;5;244m'
+BG_SHADE='\033[48;5;236m' 
 NC='\033[0m'
 
-# --- 2. DATA COLLECTION ---
-get_stats() {
+# --- REAL-TIME ANALYTICS ---
+get_metrics() {
     CPU=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%.0f", $2+$4}')
     RAM=$(free | grep Mem | awk '{printf "%.0f", $3*100/$2}')
-    UPT=$(uptime -p | sed 's/up //; s/ minutes/m/; s/ hours/h/; s/ days/d/')
-    IP=$(hostname -I | awk '{print $1}')
+    UPT=$(uptime -p | sed 's/up //')
+    DISK=$(df -h / | awk 'NR==2 {print $5}')
+    CURRENT_HOST=$(hostname)
 }
 
-# --- 3. UI RENDERER ---
+# --- THE UI RENDERER ---
 render_ui() {
     clear
-    get_stats
+    get_metrics
     
-    # --- CYBER GLOW HEADER ---
-    echo -e "  ${MAGENTA}◈${NC} ${CYAN}TERMINAL_ACCESS${NC} ${MAGENTA}◈${NC} ${GOLD}HUB_OS V 4.1${NC} ${MAGENTA}◈${NC}"
-    echo -e "${SKY_BLUE}◸${W}$(printf '%.0s━' {1..74})${SKY_BLUE}◹${NC}"
+    # --- TOP STATUS PILLS ---
+    echo -e " ${B_BLUE}${NC}${BG_SHADE}${W}   HOST: $CURRENT_HOST ${NC}${B_BLUE}${NC}  ${B_PURPLE}${NC}${BG_SHADE}${W}   $UPT ${NC}${B_PURPLE}${NC}  ${B_GREEN}${NC}${BG_SHADE}${W}   $DISK ${NC}${B_GREEN}${NC}"
+    echo -e ""
+
+    # --- CUSTOM LARGE BANNER (GRADIENT EFFECT) ---
+    echo -e "${B_CYAN} ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗      ██╗  ██╗██╗   ██╗██████╗ ${NC}"
+    echo -e "${B_CYAN}██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝      ██║  ██║██║   ██║██╔══██╗${NC}"
+    echo -e "${B_PURPLE}██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗     ███████║██║   ██║██████╔╝${NC}"
+    echo -e "${B_PURPLE}██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║     ██╔══██║██║   ██║██╔══██╗${NC}"
+    echo -e "${GOLD}╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝     ██║  ██║╚██████╔╝██████╔╝${NC}"
+    echo -e "${GOLD} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝      ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}"
     
-    # --- LOGO (RANDOM NEON GRADIENT) ---
-    echo -e "${CYAN} ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗     ██╗  ██╗██╗   ██╗██████╗ ${NC}"
-    echo -e "${CYAN}██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝     ██║  ██║██║   ██║██╔══██╗${NC}"
-    echo -e "${MAGENTA}██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗    ███████║██║   ██║██████╔╝${NC}"
-    echo -e "${MAGENTA}██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║    ██╔══██║██║   ██║██╔══██╗${NC}"
-    echo -e "${GOLD}╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝    ██║  ██║╚██████╔╝██████╔╝${NC}"
-    echo -e "${GOLD} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}"
+    echo -e "  ${G}───────────────────────────────────────────────────────────────────────────${NC}"
     
-    echo -e "${SKY_BLUE}╟$(printf '%.0s─' {1..74})╢${NC}"
+    # --- DASHBOARD CORE ---
+    echo -e "  ${W}System Health:${NC}"
+    printf "  ${G}CPU:${NC} ${B_CYAN}%-4s${NC} ${G}RAM:${NC} ${B_PURPLE}%-4s${NC} ${G}Network:${NC} ${B_GREEN}CONNECTED${NC}\n" "$CPU%" "$RAM%"
+    echo -e ""
+
+    # --- ACTION GRID (SEGMENTED) ---
+    echo -e "  ${B_CYAN}  DEPLOYMENT SERVICES${NC}"
+    echo -e "  ${G}├─ ${W}[1]${NC} Setup VPS Environment      ${G}├─ ${W}[5]${NC} Theme Configurator"
+    echo -e "  ${G}├─ ${W}[2]${NC} Pterodactyl Panel          ${G}├─ ${W}[6]${NC} System Optimizer"
+    echo -e "  ${G}└─ ${W}[3]${NC} Install Wings Node         ${G}└─ ${W}[7]${NC} No-KVM Virtualization"
+    echo -e ""
     
-    # --- SYSTEM METRICS GRID ---
-    printf "  ${GOLD}⬡ CPU:${NC} ${W}%-4s${NC} ${MAGENTA}⬡ RAM:${NC} ${W}%-4s${NC} ${ACID_GREEN}⬡ UPTIME:${NC} ${W}%-10s${NC} ${CYAN}⬡ IP:${NC} ${W}%-15s${NC}\n" "$CPU%" "$RAM%" "$UPT" "$IP"
+    echo -e "  ${B_PURPLE}  MAINTENANCE${NC}"
+    echo -e "  ${G}└─ ${W}[4]${NC} Utility Toolbox            ${B_RED}${NC}${BG_SHADE}${W} [8] SHUTDOWN ${NC}${B_RED}${NC}"
     
-    echo -e "${SKY_BLUE}╟──────────────┬───────────────────────────────┬────────────────────────────╢${NC}"
-    
-    # --- MAIN OPTIONS ---
-    echo -e "  ${SKY_BLUE}│${NC} ${GOLD}CONTROL${NC}     ${SKY_BLUE}│${NC} ${W}[01] VPS Run Setup           ${SKY_BLUE}│${NC} ${W}[05] Theme Manager      ${SKY_BLUE}│${NC}"
-    echo -e "  ${SKY_BLUE}│${NC} ${SKY_BLUE}───────────${NC} ${SKY_BLUE}│${NC} ${W}[02] Panel Manager           ${SKY_BLUE}│${NC} ${W}[06] System Options     ${SKY_BLUE}│${NC}"
-    echo -e "  ${SKY_BLUE}│${NC} ${MAGENTA}NETWORK${NC}     ${SKY_BLUE}│${NC} ${W}[03] Wings Installation      ${SKY_BLUE}│${NC} ${W}[07] NO-KVM Mode        ${SKY_BLUE}│${NC}"
-    echo -e "  ${SKY_BLUE}│${NC} ${SKY_BLUE}───────────${NC} ${SKY_BLUE}│${NC} ${W}[04] Utility Tools           ${SKY_BLUE}│${NC} ${CRIMSON}[08] EXIT SYSTEM        ${SKY_BLUE}│${NC}"
-    
-    echo -e "${SKY_BLUE}╘$(printf '%.0s━' {1..74})╛${NC}"
-    
-    # --- PROMPT ---
-    echo -e "  ${MAGENTA}»${NC} ${GOLD}User:${NC} ${W}$(whoami)${NC} ${MAGENTA}»${NC} ${ACID_GREEN}Status:${NC} ${W}Operational${NC}"
-    echo -ne "  ${CYAN}⚡${NC} ${W}root@hub${NC}:${MAGENTA}#${NC} "
+    # --- INTERACTIVE FOOTER ---
+    echo -e "\n  ${G}───────────────────────────────────────────────────────────────────────────${NC}"
+    echo -ne "  ${B_CYAN}➜${NC} ${W}Command${NC} ${G}(1-8):${NC} "
 }
 
-# --- 4. MAIN LOOP ---
+# --- CONTROLLER ---
 while true; do
     render_ui
     read -r opt
@@ -72,10 +81,10 @@ while true; do
         6) bash <(curl -s https://raw.githubusercontent.com/nobita329/The-Coding-Hub/refs/heads/main/srv/menu/System1.sh) ;;
         7) bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/run.sh) ;;
         8|exit) 
-            echo -e "\n  ${MAGENTA}System Offline.${NC} Goodbye, Nobita.\n"
+            echo -e "\n  ${B_RED}DISCONNECTED.${NC} Goodbye, Nobita."
             exit 0 ;;
         *) 
-            echo -e "  ${CRIMSON}![Error] Unknown Command${NC}"
+            echo -e "  ${B_RED}Error: Input Invalid!${NC}"
             sleep 0.5 ;;
     esac
 done
