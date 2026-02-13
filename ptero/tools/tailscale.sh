@@ -111,7 +111,7 @@ install_tailscale() {
     echo -e "${YELLOW}  └──────────────────────────────────────────────────┘${NC}"
     echo ""
     
-    sudo tailscale up
+     tailscale up
     
     echo ""
     msg_ok "Device successfully joined the Mesh!"
@@ -128,8 +128,8 @@ uninstall_tailscale() {
     
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         msg_info "Stopping Services..."
-        sudo systemctl stop tailscaled 2>/dev/null
-        sudo systemctl disable tailscaled 2>/dev/null
+         systemctl stop tailscaled 2>/dev/null
+         systemctl disable tailscaled 2>/dev/null
         
         msg_info "Removing Packages (Auto-Detect)..."
         if [ -x "$(command -v apt)" ]; then sudo apt purge tailscale -y -qq >/dev/null 2>&1
