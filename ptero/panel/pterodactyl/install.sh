@@ -1,37 +1,31 @@
 #!/bin/bash
 
 # ==========================================
-#  CYBERPUNK UI THEME v2
+#  CYBERPUNK PTERODACTYL AUTO DEPLOY v3
 # ==========================================
-C_RESET="\e[0m"
-C_RED="\e[1;31m"
-C_GREEN="\e[1;32m"
-C_YELLOW="\e[1;33m"
-C_BLUE="\e[1;34m"
-C_PURPLE="\e[1;35m"
-C_CYAN="\e[1;36m"
-C_WHITE="\e[1;37m"
-C_GRAY="\e[1;90m"
 
-line(){ echo -e "${C_GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"; }
-step(){ echo -e "${C_BLUE}➜ $1${C_RESET}"; }
-ok(){ echo -e "${C_GREEN}✔ $1${C_RESET}"; }
-warn(){ echo -e "${C_YELLOW}⚠ $1${C_RESET}"; }
-# --- COLORS ---
-NEON_GREEN="\e[1;32m"
-NEON_CYAN="\e[1;36m"
-NEON_BLUE="\e[1;34m"
-WHITE="\e[1;37m"
-GRAY="\e[0;90m"
-RED="\e[1;31m"
+# -------- COLORS --------
 RESET="\e[0m"
+RED="\e[1;31m"
+GREEN="\e[1;32m"
+YELLOW="\e[1;33m"
+BLUE="\e[1;34m"
+PURPLE="\e[1;35m"
+CYAN="\e[1;36m"
+WHITE="\e[1;37m"
+GRAY="\e[1;90m"
 
-# --- EFFECTS ---
+line(){ echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"; }
+step(){ echo -e "${BLUE}➜ $1${RESET}"; }
+ok(){ echo -e "${GREEN}✔ $1${RESET}"; }
+warn(){ echo -e "${YELLOW}⚠ $1${RESET}"; }
+fail(){ echo -e "${RED}✖ $1${RESET}"; }
 
-# Typing effect for text
+# -------- EFFECTS --------
+
 type_write() {
     text="$1"
-    delay=0.01 # Made slightly faster for better UX
+    delay=0.01
     for (( i=0; i<${#text}; i++ )); do
         echo -ne "${text:$i:1}"
         sleep $delay
@@ -39,67 +33,84 @@ type_write() {
     echo ""
 }
 
-# Block progress bar
 loading_bar() {
-    echo -ne "${NEON_GREEN}[ SYSTEM ]${RESET} "
+    echo -ne "${GREEN}[ SYSTEM ]${RESET} "
     for i in {1..20}; do
         echo -ne "█"
-        sleep 0.02
+        sleep 0.03
     done
-    echo -e " ${NEON_CYAN}ONLINE${RESET}"
+    echo -e " ${CYAN}ONLINE${RESET}"
 }
 
-# --- HEADER SECTION ---
-clear
-echo -e "${NEON_CYAN}" # Sets the color for the banner
+deploy_bar() {
+    echo -ne "${PURPLE}[ DEPLOY ]${RESET} "
+    for i in {1..25}; do
+        echo -ne "█"
+        sleep 0.04
+    done
+    echo -e " ${GREEN}SUCCESS${RESET}"
+}
 
-# The 'EOF' (quoted) prevents bash from trying to interpret backslashes
+# -------- HEADER --------
+clear
+echo -e "${CYAN}"
+
 cat << "EOF"
- ███████████   █████                                     █████                     █████               ████ 
-░░███░░░░░███ ░░███                                     ░░███                     ░░███               ░░███ 
- ░███     ░███ ███████     ██████  ████████   ██████     ███████   ██████      ██████  ███████   █████ ████ ░███ 
- ░██████████  ░░░███░     ███░░███░░███░░███ ███░░███   ███░░███  ░░░░░███    ███░░███░░░███░   ░░███ ░███  ░███ 
- ░███░░░░░░     ░███     ░███████  ░███ ░░░ ░███ ░███  ░███ ░███   ███████   ░███ ░░░   ░███     ░███ ░███  ░███ 
- ░███           ░███     ███░███   ░███     ░███ ░███  ░███ ░███  ███░░███   ░███  ███  ░███     ███ ░███  ░███ 
- █████          ░░█████ ░░██████   █████    ░░██████   ░░████████░░████████  ░░██████   ░░█████ ░░███████  █████
-░░░░░            ░░░░░   ░░░░░░   ░░░░░      ░░░░░░     ░░░░░░░░  ░░░░░░░░    ░░░░░░     ░░░░░   ░░░░░███ ░░░░░ 
-                                                                                                   ███ ░███     
-                                                                                                  ░░██████      
-                                                                                                   ░░░░░░       
+ ███████████   █████                                     █████              
+░░███░░░░░███ ░░███                                     ░░███               
+ ░███     ░███ ███████     ██████  ████████   ██████     ███████   ██████    
+ ░██████████  ░░░███░     ███░░███░░███░░███ ███░░███   ███░░███  ░░░░░███   
+ ░███░░░░░░     ░███     ░███████  ░███ ░░░ ░███ ░███  ░███ ░███   ███████   
+ ░███           ░███     ███░███   ░███     ░███ ░███  ░███ ░███  ███░░███   
+ █████          ░░█████ ░░██████   █████    ░░██████   ░░████████░░████████  
+░░░░░            ░░░░░   ░░░░░░   ░░░░░      ░░░░░░     ░░░░░░░░  ░░░░░░░░   
 EOF
 
 echo -e "${RESET}"
-echo -e "${GRAY} ┌────────────────────────────────────────────────────────────────────────┐ ${RESET}"
-echo -e "${GRAY} │ ${NEON_GREEN}       :: PTERODACTYL AUTO-DEPLOYMENT SYSTEM :: v2.0       ${GRAY}          │ ${RESET}"
-echo -e "${GRAY} └────────────────────────────────────────────────────────────────────────┘ ${RESET}"
+line
+echo -e "${GREEN}        :: PTERODACTYL AUTO DEPLOYMENT SYSTEM :: v3${RESET}"
+line
 echo ""
 
-# --- BOOT SEQUENCE ---
-echo -ne "${NEON_BLUE} [KERNEL] ${RESET}"
-type_write "Loading core modules..."
-echo -ne "${NEON_BLUE} [MEMORY] ${RESET}"
-type_write "Allocating resources..."
-
-# Small pause to look cool
+# -------- BOOT SEQUENCE --------
+echo -ne "${BLUE}[KERNEL] ${RESET}"
+type_write "Initializing core modules..."
+echo -ne "${BLUE}[MEMORY] ${RESET}"
+type_write "Allocating server resources..."
 sleep 0.5
 loading_bar
 echo ""
 
-# --- INPUT SECTION ---
-echo -e "${NEON_CYAN}>> CONFIGURATION REQUIRED <<${RESET}"
-echo -e "${GRAY}Please enter the target domain for installation.${RESET}"
-echo ""
+# -------- DOMAIN INPUT LOOP --------
+while true; do
+    line
+    echo -e "${CYAN}>> CONFIGURATION REQUIRED <<${RESET}"
+    echo ""
+    type_write "ENTER TARGET DOMAIN:"
+    echo -ne "${GREEN} root@deploy:~$ ${RESET}"
+    read DOMAIN
+    DOMAIN=${DOMAIN:-panel.example.com}
 
-# Domain Input
-type_write "ENTER TARGET DOMAIN:"
-echo -ne "${NEON_GREEN} root@install:~$ ${RESET}"
-read DOMAIN
-DOMAIN=${DOMAIN:-panel.example.com}
+    echo ""
+    echo -e "${CYAN}>> TARGET ENTERED: ${WHITE}$DOMAIN${RESET}"
+    echo -ne "${YELLOW}Confirm deployment? (y/n): ${RESET}"
+    read CONFIRM
+
+    if [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" ]]; then
+        echo ""
+        ok "Target Locked: $DOMAIN"
+        break
+    elif [[ "$CONFIRM" == "n" || "$CONFIRM" == "N" ]]; then
+        warn "Re-entering domain configuration..."
+    else
+        fail "Invalid choice. Use y or n."
+    fi
+done
 
 echo ""
-echo -e "${NEON_CYAN}>> TARGET ACQUIRED: ${WHITE}$DOMAIN ${RESET}"
-echo -e "${NEON_CYAN}>> EXECUTING ROOT PROTOCOLS...${RESET}"
-echo -e "${GRAY}-----------------------------------${RESET}"
+line
+echo -e "${PURPLE}>> EXECUTING ROOT PROTOCOLS...${RESET}"
+sleep 1
 
 # Add your actual install logic below this line
 sleep 1
