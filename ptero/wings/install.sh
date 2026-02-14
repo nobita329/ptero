@@ -1,173 +1,188 @@
 #!/bin/bash
-# ===========================================================
-# WINGS AUTO-INSTALLER - OBSIDIAN NEXT GEN (v11.7)
-# Style: Full Segmented UI / Nobita Edition / Auto-Detect
-# ===========================================================
+set -e
 
-# --- 0. PRE-INITIALIZATION ---
-hostnamectl set-hostname Nobita 2>/dev/null
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+NC='\033[0m' # No Color
 
-# --- CLEAN COLORS ---
-B_BLUE='\033[1;38;5;33m'
-B_CYAN='\033[1;38;5;51m'
-B_PURPLE='\033[1;38;5;141m'
-B_GREEN='\033[1;38;5;82m'
-B_RED='\033[1;38;5;196m'
-GOLD='\033[38;5;220m'
-W='\033[1;38;5;255m'
-G='\033[0;38;5;244m'
-BG_SHADE='\033[48;5;236m' 
-NC='\033[0m'
+# UI Elements
+CHECKMARK="✓"
+CROSSMARK="✗"
+ARROW="➤"
 
-# --- UI ENGINE ---
-tput civis
-trap 'tput cnorm; echo -ne "${NC}"' EXIT
-
-# --- ROBUST METRICS (Zero Leak Fix) ---
-get_metrics() {
-    # CPU Load
-    CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d. -f1)
-    [[ -z "$CPU" ]] && CPU="0"
-    
-    # RAM Load
-    RAM=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100}' 2>/dev/null)
-    [[ -z "$RAM" ]] && RAM="0"
-    
-    UPT=$(uptime -p | sed 's/up //')
-    IP=$(hostname -I | awk '{print $1}')
-    OS=$(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')
-    CURRENT_HOST=$(hostname)
+# Function to print section headers
+print_header() {
+    echo -e "\n${MAGENTA}╔══════════════════════════════════════════╗${NC}"
+    echo -e "${MAGENTA}║${NC}${CYAN}   $1${NC}"
+    echo -e "${MAGENTA}╚══════════════════════════════════════════╝${NC}"
 }
 
-draw_header() {
-    clear
-    get_metrics
-    # Top Status Bar
-    echo -e " ${B_BLUE}${NC}${BG_SHADE}${W}   HOST: $CURRENT_HOST ${NC}${B_BLUE}${NC}  ${B_PURPLE}${NC}${BG_SHADE}${W}   $UPT ${NC}${B_PURPLE}${NC}  ${B_GREEN}${NC}${BG_SHADE}${W} 🌐 IP: $IP ${NC}${B_GREEN}${NC}"
-    echo -e ""
-
-    # Big Custom Banner
-    echo -e "${B_CYAN} ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗      ██╗  ██╗██╗   ██╗██████╗ ${NC}"
-    echo -e "${B_CYAN}██╔════╝██╔═══██╗██╔══██╗██║████╗  ██║██╔════╝      ██║  ██║██║   ██║██╔══██╗${NC}"
-    echo -e "${B_PURPLE}██║     ██║   ██║██║  ██║██║██╔██╗ ██║██║  ███╗     ███████║██║   ██║██████╔╝${NC}"
-    echo -e "${B_PURPLE}██║     ██║   ██║██║  ██║██║██║╚██╗██║██║   ██║     ██╔══██║██║   ██║██╔══██╗${NC}"
-    echo -e "${GOLD}╚██████╗╚██████╔╝██████╔╝██║██║ ╚████║╚██████╔╝     ██║  ██║╚██████╔╝██████╔╝${NC}"
-    echo -e "${GOLD} ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝      ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ${NC}"
-    
-    echo -e "  ${G}───────────────────────────────────────────────────────────────────────────${NC}"
-    echo -e "  ${W}System Stats:${NC} ${G}CPU:${NC} ${B_CYAN}${CPU}%${NC}  ${G}RAM:${NC} ${B_PURPLE}${RAM}%${NC}  ${G}Target OS:${NC} ${W}$OS${NC}"
-    echo ""
+print_status() {
+    echo -e "${YELLOW}${ARROW} $1...${NC}"
 }
 
-msg_step() {
-    echo -e "  ${B_PURPLE}${NC}${BG_SHADE}${W} 🛠️  $1 ${NC}${B_PURPLE}${NC}"
-    echo -e "  ${G}└──────────────────────────────────────────────────────────${NC}"
+print_success() {
+    echo -e "${GREEN}${CHECKMARK} $1${NC}"
 }
 
-run_task() {
-    local msg="$1"
-    local cmd="$2"
-    local spin='-\|/'
-    local i=0
+print_error() {
+    echo -e "${RED}${CROSSMARK} $1${NC}"
+}
 
-    echo -ne "    ${B_CYAN}➜${NC} $msg... "
-    eval "$cmd" > /dev/null 2>&1 &
-    local pid=$!
-
-    while kill -0 $pid 2>/dev/null; do
-        i=$(( (i+1) %4 ))
-        printf "\b${B_BLUE}${spin:$i:1}${NC}"
-        sleep 0.1
-    done
-    wait $pid
+# Function to check if command succeeded
+check_success() {
     if [ $? -eq 0 ]; then
-        printf "\r    ${B_GREEN}✔${NC} $msg                                \n"
+        print_success "$1"
+        return 0
     else
-        printf "\r    ${B_RED}✖${NC} $msg ${B_RED}[FAILED]${NC}\n"
-        exit 1
+        print_error "$2"
+        return 1
     fi
 }
 
-# --- PROCESS START ---
+# Clear screen and show welcome
+clear
+echo -e "${BLUE}╔══════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}║${NC}${CYAN}     PTERODACTYL WINGS INSTALLER     ${NC}${BLUE}║${NC}"
+echo -e "${BLUE}╚══════════════════════════════════════════╝${NC}"
 
+# Check if running as root
 if [ "$EUID" -ne 0 ]; then
-    echo -e "  ${B_RED}✖ Error:${NC} Please run as root."
+    print_error "Please run as root"
     exit 1
 fi
 
-draw_header
+# ------------------------
+# 1. Docker install
+# ------------------------
+print_header "INSTALLING DOCKER"
+print_status "Installing Docker"
+curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+check_success "Docker installed"
 
-# 1. DOCKER SETUP
-msg_step "CONTAINER ENGINE SETUP"
-if ! command -v docker >/dev/null 2>&1; then
-    run_task "Detecting Environment" "sleep 1"
-    run_task "Installing Docker Engine" "curl -sSL https://get.docker.com/ | sh"
-    run_task "Enabling Docker Service" "systemctl enable --now docker"
-else
-    echo -e "    ${B_GREEN}✔${NC} Docker is already active."
+print_status "Starting Docker service"
+sudo systemctl enable --now docker > /dev/null 2>&1
+check_success "Docker service started"
+
+# ------------------------
+# 2. Update GRUB
+# ------------------------
+print_header "UPDATING SYSTEM"
+GRUB_FILE="/etc/default/grub"
+if [ -f "$GRUB_FILE" ]; then
+    print_status "Updating GRUB"
+    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="swapaccount=1"/' $GRUB_FILE
+    sudo update-grub > /dev/null 2>&1
+    check_success "GRUB updated"
 fi
-echo ""
 
-# 2. WINGS BINARY (AUTO-DETECT ARCH)
-msg_step "WINGS CORE INSTALLATION"
-run_task "Creating Directories" "mkdir -p /etc/pterodactyl"
+# ------------------------
+# 3. Wings install
+# ------------------------
+print_header "INSTALLING WINGS"
+print_status "Creating directories"
+sudo mkdir -p /etc/pterodactyl
+check_success "Directories created"
+
+print_status "Detecting architecture"
 ARCH=$(uname -m)
 if [ "$ARCH" == "x86_64" ]; then 
-    DL_URL="https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64"
-elif [ "$ARCH" == "aarch64" ]; then
-    DL_URL="https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_arm64"
-else
-    echo -e "    ${B_RED}✖ Unsupported Arch: $ARCH${NC}"
-    exit 1
+    ARCH="amd64"
+else 
+    ARCH="arm64"
 fi
 
-run_task "Downloading Binary ($ARCH)" "curl -L -o /usr/local/bin/wings '$DL_URL'"
-run_task "Setting Permissions" "chmod u+x /usr/local/bin/wings"
-echo ""
+print_status "Downloading Wings"
+curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$ARCH" > /dev/null 2>&1
+check_success "Wings downloaded"
 
-# 3. SERVICE SETUP
-msg_step "SYSTEMD CONFIGURATION"
-cat <<EOF > /etc/systemd/system/wings.service
+print_status "Setting permissions"
+sudo chmod u+x /usr/local/bin/wings
+check_success "Permissions set"
+
+# ------------------------
+# 4. Wings service
+# ------------------------
+print_header "CONFIGURING SERVICE"
+print_status "Creating service file"
+WINGS_SERVICE_FILE="/etc/systemd/system/wings.service"
+sudo tee $WINGS_SERVICE_FILE > /dev/null <<EOF
 [Unit]
 Description=Pterodactyl Wings Daemon
 After=docker.service
 Requires=docker.service
+PartOf=docker.service
 
 [Service]
 User=root
 WorkingDirectory=/etc/pterodactyl
 LimitNOFILE=4096
+PIDFile=/var/run/wings/daemon.pid
 ExecStart=/usr/local/bin/wings
 Restart=on-failure
 StartLimitInterval=180
+StartLimitBurst=30
 RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
 EOF
+check_success "Service file created"
 
-run_task "Reloading Daemons" "systemctl daemon-reload"
-run_task "Enabling Wings Service" "systemctl enable wings"
-echo ""
+print_status "Reloading systemd"
+sudo systemctl daemon-reload > /dev/null 2>&1
+check_success "Systemd reloaded"
 
-# 4. SSL SETUP
-msg_step "SECURITY & AUTO-SSL"
-run_task "Generating Self-Signed Cert" "mkdir -p /etc/certs/wing && cd /etc/certs/wing && openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj '/C=NA/ST=NA/L=NA/O=NA/CN=Nobita' -keyout /etc/certs/wing/privkey.pem -out /etc/certs/wing/fullchain.pem"
-echo ""
+print_status "Enabling service"
+sudo systemctl enable wings > /dev/null 2>&1
+check_success "Service enabled"
 
-# 5. COMPLETION
-echo -e "  ${B_GREEN}${NC}${BG_SHADE}${W} ✅ WINGS READY FOR NOBITA ${NC}${B_GREEN}${NC}"
-echo -e "  ${G}─────────────────────────────────────────────────────────────${NC}"
-echo -e "  ${W}Next Steps:${NC}"
-echo -e "  ${B_CYAN}1.${NC} Paste config in: ${B_PURPLE}/etc/pterodactyl/config.yml${NC}"
-echo -e "  ${B_CYAN}2.${NC} Run: ${B_GREEN}systemctl start wings${NC}"
-echo -e "  ${B_CYAN}3.${NC} Manage with shortcut: ${B_GREEN}wing${NC}"
-echo ""
+# ------------------------
+# 5. SSL Certificate
+# ------------------------
+print_header "GENERATING SSL"
+print_status "Creating certificate"
+sudo mkdir -p /etc/certs/wing
+cd /etc/certs/wing || exit
+sudo openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 \
+-subj "/C=NA/ST=NA/L=NA/O=NA/CN=Generic SSL Certificate" \
+-keyout privkey.pem -out fullchain.pem > /dev/null 2>&1
+check_success "SSL certificate generated"
 
-# Shortcut command
-cat <<'EOF' > /usr/local/bin/wing
+# ------------------------
+# 6. Helper command
+# ------------------------
+print_header "CREATING HELPER"
+print_status "Creating wing command"
+sudo tee /usr/local/bin/wing > /dev/null <<'EOF'
 #!/bin/bash
-echo -e "\033[1;34m:: WINGS CONTROLLER ::\033[0m"
-echo "  start/stop/restart/status/logs"
+echo ""
+echo "Wings Helper Commands:"
+echo "  start    : sudo systemctl start wings"
+echo "  stop     : sudo systemctl stop wings"
+echo "  status   : sudo systemctl status wings"
+echo "  restart  : sudo systemctl restart wings"
+echo "  logs     : sudo journalctl -u wings -f"
+echo ""
 EOF
-chmod +x /usr/local/bin/wing
+
+sudo chmod +x /usr/local/bin/wing
+check_success "Helper created"
+
+# ------------------------
+# Complete
+# ------------------------
+print_header "COMPLETE"
+echo -e "${GREEN}${CHECKMARK} Installation finished${NC}"
+echo ""
+echo -e "${CYAN}Start Wings:${NC}"
+echo -e "  sudo systemctl start wings"
+echo ""
+echo -e "${CYAN}Use helper:${NC}"
+echo -e "  wing"
+echo ""
