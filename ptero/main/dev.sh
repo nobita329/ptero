@@ -6,7 +6,6 @@
 
 # --- 0. PRE-INITIALIZATION ---
 # Change hostname to Nobita before rendering
-hostnamectl set-hostname Nobita 2>/dev/null
 
 # --- PRECISE COLORS ---
 B_BLUE='\033[1;38;5;33m'
