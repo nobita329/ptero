@@ -189,9 +189,10 @@ while true; do
     echo -e "${CYAN} │${NC}  ${GREEN}[1]${NC} Install Panel     ${GRAY}:: (Fresh Install)${NC}          ${CYAN}│${NC}"
     echo -e "${CYAN} │${NC}  ${GREEN}[2]${NC} Create User       ${GRAY}:: (Add Admin/User)${NC}        ${CYAN}│${NC}"
     echo -e "${CYAN} │${NC}  ${YELLOW}[3]${NC} Update Panel      ${GRAY}:: (Latest Release)${NC}        ${CYAN}│${NC}"
-    echo -e "${CYAN} │${NC}  ${RED}[4]${NC} Uninstall Panel   ${GRAY}:: (Remove Data)${NC}           ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${RED}[4]${NC} Domin                ${GRAY}:: (Chang/domin/ssl)${NC}           ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${RED}[5]${NC} Uninstall Panel   ${GRAY}:: (Remove Data)${NC}           ${CYAN}│${NC}"
     echo -e "${CYAN} │${NC}                                                       ${CYAN}│${NC}"
-    echo -e "${CYAN} │${NC}  ${WHITE}[5] Exit System${NC}                                   ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${WHITE}[6] Exit System${NC}                                   ${CYAN}│${NC}"
     echo -e "${CYAN} └───────────────────────────────────────────────────────┘${NC}"
     echo ""
     echo -ne "${BOLD}${WHITE}  root@ptero:~# ${NC}"
@@ -201,8 +202,9 @@ while true; do
         1) install_ptero ;;
         2) create_user ;;
         3) update_panel ;;
-        4) uninstall_ptero ;;
-        5) clear; exit ;;
+        4) bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/pterodactyl/ssl.sh) ;;
+        5) uninstall_ptero ;;
+        6) clear; exit ;;
         *) echo -e "${RED}  Invalid option selected...${NC}"; sleep 1 ;;
     esac
 done
