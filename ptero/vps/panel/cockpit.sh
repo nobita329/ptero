@@ -75,15 +75,50 @@ draw_header() {
 install_stack() {
     echo -e "${C_GRAY}──────────────────────────────────────────────────${C_RESET}"
     echo -e "${C_BLUE}➜ Installing Virtualization Stack...${C_RESET}"
-    
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS=$ID
+    else
+        echo "❌ Failed to detect OS."
+        exit 1
+    fi
+
+    case "$OS" in
+        ubuntu)
+            echo "✅ Ubuntu detected. Running ubuntu script..."
     # 1. Update
-    sudo apt update -qq >/dev/null
-    
+    apt update && apt upgrade -y && apt install curl wget git sudo nano -y
     # 2. Cockpit
     echo -e "${C_YELLOW}➜ Installing Cockpit (Web UI)...${C_RESET}"
-    sudo apt install -y cockpit
+    . /etc/os-release
+    sudo apt install -t ${VERSION_CODENAME}-backports cockpit
     sudo systemctl enable --now cockpit.socket
+    # 3. KVM / Libvirt
+    echo -e "${C_YELLOW}➜ Installing KVM & Libvirt...${C_RESET}"
+    sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+    sudo systemctl enable --now libvirtd
 
+    # 4. Plugins & Permissions
+    echo -e "${C_YELLOW}➜ Installing Cockpit-Machines Plugin...${C_RESET}"
+    sudo apt install -y cockpit-machines
+    
+    echo -e "${C_YELLOW}➜ Configuring Permissions...${C_RESET}"
+    sudo usermod -aG libvirt,kvm $USER
+    # Allow root login to cockpit (optional, but often needed on VPS)
+    if [ -f /etc/cockpit/disallowed-users ]; then
+        sudo sed -i '/root/d' /etc/cockpit/disallowed-users
+    fi
+    sudo systemctl restart cockpit
+            ;;
+        debian)
+            echo "✅ Debian detected. Running debian script..."
+    # 1. Update
+    apt update && apt upgrade -y && apt install curl wget git sudo nano -y
+    # 2. Cockpit
+    echo -e "${C_YELLOW}➜ Installing Cockpit (Web UI)...${C_RESET}"
+    . /etc/os-release
+    sudo apt install -t ${VERSION_CODENAME}-backports cockpit
+    sudo systemctl enable --now cockpit.socket
     # 3. KVM / Libvirt
     echo -e "${C_YELLOW}➜ Installing KVM & Libvirt...${C_RESET}"
     sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
@@ -100,7 +135,13 @@ install_stack() {
         sudo sed -i '/root/d' /etc/cockpit/disallowed-users
     fi
     
-    sudo systemctl restart cockpit
+    sudo systemctl restart cockpit            ;;
+        *)
+            echo "❌ Script works only on Ubuntu/Debian"
+            exit 1
+            ;;
+    esac
+#============================================================================================
 
     echo -e "${C_GREEN}✔ Installation Complete!${C_RESET}"
     pause
