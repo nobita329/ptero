@@ -91,6 +91,9 @@ install_stack() {
     # 2. Cockpit
     echo -e "${C_YELLOW}➜ Installing Cockpit (Web UI)...${C_RESET}"
     . /etc/os-release
+    echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-backports main" | \
+    sudo tee /etc/apt/sources.list.d/backports.list
+    sudo apt update
     sudo apt install -t ${VERSION_CODENAME}-backports cockpit
     sudo systemctl enable --now cockpit.socket
     # 3. KVM / Libvirt
