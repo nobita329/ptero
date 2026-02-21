@@ -37,19 +37,20 @@ tools_menu() {
         echo -e "${BLUE}  [ ACCESS & NETWORK ]${NC}"
         echo -e "  ${GREEN}1)${NC} Root Access         ${GRAY}:: (Enable Root/Sudo)${NC}"
         echo -e "  ${GREEN}2)${NC} Tailscale           ${GRAY}:: (Mesh VPN Setup)${NC}"
-        echo -e "  ${GREEN}3)${NC} Cloudflare DNS      ${GRAY}:: (Tunnel & DNS)${NC}"
+        echo -e "  ${GREEN}3)${NC} Zerotier            ${GRAY}:: (wifi VPN Setup)${NC}"
+        echo -e "  ${GREEN}4)${NC} Cloudflare DNS      ${GRAY}:: (Tunnel & DNS)${NC}"
         echo ""
 
         # -- SECTION 2: SYSTEM & OPS --
         echo -e "${YELLOW}  [ SYSTEM OPERATIONS ]${NC}"
-        echo -e "  ${GREEN}4)${NC} System Info         ${GRAY}:: (Specs & Status)${NC}"
-        echo -e "  ${GREEN}5)${NC} Port Forward        ${GRAY}:: (TCP/UDP)${NC}"
+        echo -e "  ${GREEN}5)${NC} System Info         ${GRAY}:: (Specs & Status)${NC}"
+        echo -e "  ${GREEN}6)${NC} Port Forward        ${GRAY}:: (TCP/UDP)${NC}"
         echo ""
 
         # -- SECTION 3: INTERFACE --
         echo -e "${PURPLE}  [ GUI & TERMINAL ]${NC}"
-        echo -e "  ${GREEN}6)${NC} Web Terminal        ${GRAY}:: (Browser Shell)${NC}"
-        echo -e "  ${GREEN}7)${NC} RDP Installer       ${GRAY}:: (Remote Desktop)${NC}"
+        echo -e "  ${GREEN}7)${NC} Web Terminal        ${GRAY}:: (Browser Shell)${NC}"
+        echo -e "  ${GREEN}8)${NC} RDP Installer       ${GRAY}:: (Remote Desktop)${NC}"
         echo ""
 
         # -- FOOTER --
@@ -71,26 +72,30 @@ tools_menu() {
                 bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/tailscale.sh) 
                 pause ;;
             3) 
+                echo -e "\n${YELLOW}Running Zerotier Installer...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/zerotier.sh) 
+                pause ;;
+            4) 
                 echo -e "\n${YELLOW}Running Cloudflare Script...${NC}"
                 bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/cloudflare.sh) 
                 pause ;;
-            4) 
+            5) 
                 echo -e "\n${YELLOW}Fetching System Info...${NC}"
                 bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/info.sh) 
                 pause ;;
-            5) 
+            6) 
                 echo -e "\n${YELLOW}Running tcp Optimizer...${NC}"
                 bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/localtonet.sh) 
                 pause ;;
-            6) 
+            7) 
                 echo -e "\n${YELLOW}Installing Web Terminal...${NC}"
                 bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/tools/terminal.sh) 
                 pause ;;
-            7) 
+            8) 
                 echo -e "\n${YELLOW}Installing RDP...${NC}"
                 bash <(curl -s https://raw.githubusercontent.com/nobita329/The-Coding-Hub/refs/heads/main/srv/tools/rdp.sh) 
                 pause ;;
-            8) 
+            0) 
                 break ;;
             *) 
                 echo -e "${RED}Invalid Option${NC}"
