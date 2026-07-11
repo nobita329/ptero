@@ -53,7 +53,8 @@ while true; do
     echo -e "${B_CYAN}┃${NC} [4] Win 2016   ➔ $(get_docker_status "windows2016")"
     echo -e "${B_CYAN}┃${NC} [5] Tailscale  ➔ $(get_docker_status "tailscale")"
     echo -e "${B_CYAN}┃${NC} [6] Tocaltonet ➔ $(get_docker_status "localtonet")"
-    echo -e "${B_CYAN}┃${NC} [7] ${B_RED}EXIT SYSTEM${NC}"
+    echo -e "${B_CYAN}┃${NC} [7] Proxmox    ➔ $(get_docker_status "proxmox")"
+    echo -e "${B_CYAN}┃${NC} [8] ${B_RED}EXIT SYSTEM${NC}"
     echo -e "${B_CYAN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
     echo -ne "${B_YELLOW}Option select karein >> ${NC}"
     read -r choice
@@ -65,7 +66,8 @@ while true; do
         4) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/win16.sh" "windows2016" ;;
         5) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/tailscale.sh" "tailscale" ;;
         6) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/localtonet.sh" "localtonet" ;;
-        7) exit 0 ;;
+        7) execute_script "https://raw.githubusercontent.com/nobita329/NobitaHost/refs/heads/main/contenar/poxmox.sh" "proxmox" ;;
+        8) exit 0 ;;
         *) echo -e "${B_RED}Invalid!${NC}" ; sleep 1 ;;
     esac
 done
