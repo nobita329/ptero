@@ -62,7 +62,7 @@ while true; do
     case $choice in
         1) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/cockpit/run.sh" "cockpit" ;;
         2) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/SSH.sh" "shellngn" ;;
-        3) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/kali-rdp.sh" "kali-rdp" ;;
+        3) execute_script "https://raw.githubusercontent.com/nobita329/NobitaHost/refs/heads/main/contenar/kubek.sh" "kubek" ;;
         4) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/win16.sh" "windows2016" ;;
         5) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/tailscale.sh" "tailscale" ;;
         6) execute_script "https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/no-kvm/localtonet.sh" "localtonet" ;;
