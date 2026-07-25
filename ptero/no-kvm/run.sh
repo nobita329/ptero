@@ -49,7 +49,7 @@ while true; do
     echo -e "${B_CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${NC}"
     echo -e "${B_CYAN}┃${NC} [1] Cockpit    ➔ $(get_docker_status "cockpit")"
     echo -e "${B_CYAN}┃${NC} [2] SSH WAB    ➔ $(get_docker_status "shellngn")"
-    echo -e "${B_CYAN}┃${NC} [3] Kali RDP   ➔ $(get_docker_status "kali-rdp")"
+    echo -e "${B_CYAN}┃${NC} [3] kubek      ➔ $(get_docker_status "kubek")"
     echo -e "${B_CYAN}┃${NC} [4] Win 2016   ➔ $(get_docker_status "windows2016")"
     echo -e "${B_CYAN}┃${NC} [5] Tailscale  ➔ $(get_docker_status "tailscale")"
     echo -e "${B_CYAN}┃${NC} [6] Tocaltonet ➔ $(get_docker_status "localtonet")"
